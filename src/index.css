@@ -13,6 +13,9 @@
   --theme-orange-soft: rgba(255, 106, 42, 0.2);
   --theme-shadow: 0 24px 60px rgba(0, 0, 0, 0.28);
   --container-width: 1280px;
+  --bp-tablet: 980px;
+  --bp-mobile: 720px;
+  --bp-mobile-sm: 480px;
   --font-body: "Manrope", "Segoe UI", sans-serif;
   --font-display: "Sora", "Manrope", "Segoe UI", sans-serif;
 }

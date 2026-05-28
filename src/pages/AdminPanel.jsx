@@ -17,7 +17,7 @@ const AdminPanel = () => {
     },[user])
 
   return (
-    <div className='admin-shell md:flex hidden'>
+    <div className='admin-shell'>
 
         <aside className='admin-sidebar'>
                 <div className='admin-sidebar__profile'>

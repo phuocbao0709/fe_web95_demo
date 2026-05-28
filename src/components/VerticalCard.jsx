@@ -16,7 +16,7 @@ const VerticalCard = ({loading,data = []}) => {
     }
 
   return (
-    <div className='grid grid-cols-[repeat(auto-fit,minmax(260px,300px))] justify-center md:justify-between md:gap-4 overflow-x-scroll scrollbar-none transition-all'>
+    <div className='product-grid'>
     {
 
          loading ? (
@@ -41,7 +41,7 @@ const VerticalCard = ({loading,data = []}) => {
              data.map((product,index)=>{
                  const imageUrl = getImageUrl(product?.productImage)
                  return(
-                     <Link to={"/product/"+product?._id} className='w-full min-w-[280px]  md:min-w-[300px] max-w-[280px] md:max-w-[300px] product-card-vertical' onClick={scrollTop} key={product?._id}>
+                     <Link to={"/product/"+product?._id} className='product-card-vertical' onClick={scrollTop} key={product?._id}>
                          <div className='product-card-vertical__media'>
                              {imageUrl ? <img src={imageUrl} className='product-card-vertical__image'/> : <span className='image-placeholder-text'>No image</span>}
                          </div>
