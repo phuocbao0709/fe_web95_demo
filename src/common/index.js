@@ -1,4 +1,17 @@
-const backendDomin = import.meta.env.VITE_BACKEND_URL || "http://localhost:3003"
+const rawBackendUrl = import.meta.env.VITE_BACKEND_URL?.trim()
+const isDev = import.meta.env.DEV
+
+const backendDomin = rawBackendUrl
+    ? rawBackendUrl.replace(/\/+$/, "")
+    : isDev
+        ? "http://localhost:3003"
+        : null
+
+if (!backendDomin) {
+    throw new Error(
+        "Missing VITE_BACKEND_URL in production build. Set it in Vercel Project Settings before deploying."
+    )
+}
 
 const SummaryApi = {
     signUP : {
