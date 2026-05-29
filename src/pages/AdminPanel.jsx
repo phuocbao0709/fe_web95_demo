@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux'
 import { FaRegCircleUser } from "react-icons/fa6";
 import { Link, Outlet, useNavigate } from 'react-router-dom';
 import ROLE from '../common/role';
-import { FiPackage, FiUsers } from "react-icons/fi";
+import { FiPackage, FiUsers, FiClipboard } from "react-icons/fi";
 
 const AdminPanel = () => {
     const user = useSelector(state => state?.user?.user)
@@ -44,6 +44,10 @@ const AdminPanel = () => {
                         <Link to={"all-products"} className='admin-sidebar__link'>
                             <FiPackage />
                             <span>All Product</span>
+                        </Link>
+                        <Link to={"orders"} className='admin-sidebar__link'>
+                            <FiClipboard />
+                            <span>Orders</span>
                         </Link>
                     </nav>
                 </div>  

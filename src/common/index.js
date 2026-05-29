@@ -73,6 +73,26 @@ const SummaryApi = {
         url : `${backendDomin}/api/delete-cart-product`,
         method : 'post'
     },
+    createCheckoutSession : {
+        url : `${backendDomin}/api/create-checkout-session`,
+        method : 'post'
+    },
+    myOrders : {
+        url : `${backendDomin}/api/my-orders`,
+        method : 'get'
+    },
+    orderDetails : {
+        url : `${backendDomin}/api/order`,
+        method : 'get'
+    },
+    adminOrders : {
+        url : `${backendDomin}/api/admin/orders`,
+        method : 'get'
+    },
+    updateOrderStatus : {
+        url : `${backendDomin}/api/admin/order-status`,
+        method : 'post'
+    },
     searchProduct : {
         url : `${backendDomin}/api/search`,
         method : 'get'

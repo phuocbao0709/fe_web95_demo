@@ -139,6 +139,7 @@ const Header = () => {
                               <Link to={"/admin-panel/all-products"} className='header-user-dropdown-link' onClick={()=>setMenuDisplay(preve => !preve)}>Admin Panel</Link>
                             )
                           }
+                          <Link to={"/my-orders"} className='header-user-dropdown-link' onClick={()=>setMenuDisplay(preve => !preve)}>My Orders</Link>
                          
                         </nav>
                       </div>
