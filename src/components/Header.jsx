@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import Logo from './Logo'
 import { GrSearch } from "react-icons/gr";
 import { FaRegCircleUser } from "react-icons/fa6";
@@ -18,11 +18,16 @@ const Header = () => {
   const [menuDisplay,setMenuDisplay] = useState(false)
   const context = useContext(Context)
   const navigate = useNavigate()
-  const searchInput = useLocation()
-  const URLSearch = new URLSearchParams(searchInput?.search)
-  const searchQuery = URLSearch.getAll("q")
+  const location = useLocation()
+  const urlSearch = new URLSearchParams(location?.search)
+  const searchQuery = urlSearch.get("q") || ""
   const [search,setSearch] = useState(searchQuery)
-  const activeCategories = URLSearch.getAll("category")
+  const activeCategories = urlSearch.getAll("category")
+
+  useEffect(() => {
+    setSearch(searchQuery)
+    setMenuDisplay(false)
+  }, [searchQuery, location.pathname])
 
   const handleLogout = async() => {
     const fetchData = await fetch(SummaryApi.logout_user.url,{
@@ -49,7 +54,7 @@ const Header = () => {
     setSearch(value)
 
     if(value){
-      navigate(`/search?q=${value}`)
+      navigate(`/search?q=${encodeURIComponent(value)}`)
     }else{
       navigate("/search")
     }
@@ -85,7 +90,7 @@ const Header = () => {
             <nav className='site-header__nav'>
               {
                 productCategory.map((category) => {
-                  const isActive = searchInput.pathname === "/product-category" && (
+                  const isActive = location.pathname === "/product-category" && (
                     activeCategories.includes(category.value) ||
                     getCategoryFilters(category.value).some((filterValue) => activeCategories.includes(filterValue))
                   )

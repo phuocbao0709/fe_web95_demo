@@ -24,9 +24,8 @@ const VerticalCardProduct = ({category, heading}) => {
     const fetchData = async() =>{
         setLoading(true)
         const categoryProduct = await fetchCategoryWiseProduct(category)
+        setData(Array.isArray(categoryProduct?.data) ? categoryProduct.data : [])
         setLoading(false)
-
-        setData(categoryProduct?.data)
     }
 
     useEffect(()=>{

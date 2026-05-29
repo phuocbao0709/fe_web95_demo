@@ -22,7 +22,7 @@ const VerticalCard = ({loading,data = []}) => {
          loading ? (
              loadingList.map((product,index)=>{
                  return(
-                     <div className='product-card-vertical product-card-vertical--loading'>
+                     <div className='product-card-vertical product-card-vertical--loading' key={`vertical-loading-${index}`}>
                          <div className='product-card-vertical__media product-card-skeleton'>
                          </div>
                          <div className='product-card-vertical__content'>

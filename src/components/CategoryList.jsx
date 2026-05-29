@@ -11,10 +11,20 @@ const CategoryList = () => {
 
     const fetchCategoryProduct = async() =>{
         setLoading(true)
-        const response = await fetch(SummaryApi.categoryProduct.url)
-        const dataResponse = await response.json()
-        setLoading(false)
-        setCategoryProduct(dataResponse.data)
+
+        try {
+            const response = await fetch(SummaryApi.categoryProduct.url)
+            const dataResponse = await response.json()
+            const nextCategoryProducts = Array.isArray(dataResponse?.data)
+                ? dataResponse.data
+                : []
+
+            setCategoryProduct(nextCategoryProducts)
+        } catch (_error) {
+            setCategoryProduct([])
+        } finally {
+            setLoading(false)
+        }
     }
 
     useEffect(()=>{
@@ -35,7 +45,7 @@ const CategoryList = () => {
                     })  
                 ) :
                 (
-                    categoryProduct.map((product,index)=>{
+                    categoryProduct.map((product)=>{
                         const imageUrl = getImageUrl(product?.productImage)
                         return(
                             <Link to={"/product-category?category="+product?.category} className='category-pill' key={product?.category}>

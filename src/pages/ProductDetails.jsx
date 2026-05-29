@@ -4,22 +4,24 @@ import SummaryApi from '../common'
 import { FaStar } from "react-icons/fa";
 import { FaStarHalf } from "react-icons/fa";
 import displayINRCurrency from '../helpers/displayCurrency';
-import VerticalCardProduct from '../components/VerticalCardProduct';
+import { toast } from 'react-toastify';
 import CategroyWiseProductDisplay from '../components/CategoryWiseProductDisplay';
 import addToCart from '../helpers/addToCart';
 import Context from '../context';
 import getImageUrl from '../helpers/getImageUrl';
 
+const initialProductState = {
+  productName : "",
+  brandName : "",
+  category : "",
+  productImage : [],
+  description : "",
+  price : "",
+  sellingPrice : ""
+}
+
 const ProductDetails = () => {
-  const [data,setData] = useState({
-    productName : "",
-    brandName : "",
-    category : "",
-    productImage : [],
-    description : "",
-    price : "",
-    sellingPrice : ""
-  })
+  const [data,setData] = useState(initialProductState)
   const params = useParams()
   const [loading,setLoading] = useState(true)
   const productImageListLoading = new Array(4).fill(null)
@@ -30,40 +32,75 @@ const ProductDetails = () => {
   const navigate = useNavigate()
 
   const fetchProductDetails = async()=>{
-    setLoading(true)
-    const response = await fetch(SummaryApi.productDetails.url,{
-      method : SummaryApi.productDetails.method,
-      headers : {
-        "content-type" : "application/json"
-      },
-      body : JSON.stringify({
-        productId : params?.id
-      })
-    })
-    setLoading(false)
-    const dataReponse = await response.json()
+    if (!params?.id) {
+      setData(initialProductState)
+      setActiveImage("")
+      setLoading(false)
+      return
+    }
 
-    setData(dataReponse?.data)
-    setActiveImage(getImageUrl(dataReponse?.data?.productImage))
+    setLoading(true)
+
+    try {
+      const response = await fetch(SummaryApi.productDetails.url,{
+        method : SummaryApi.productDetails.method,
+        headers : {
+          "content-type" : "application/json"
+        },
+        body : JSON.stringify({
+          productId : params?.id
+        })
+      })
+
+      const dataReponse = await response.json()
+      const productData = dataReponse?.data && typeof dataReponse.data === "object"
+        ? {
+            ...initialProductState,
+            ...dataReponse.data,
+            productImage : Array.isArray(dataReponse.data?.productImage)
+              ? dataReponse.data.productImage
+              : dataReponse.data?.productImage
+                  ? [dataReponse.data.productImage]
+                  : []
+          }
+        : initialProductState
+
+      setData(productData)
+      setActiveImage(getImageUrl(productData.productImage))
+
+      if (!response.ok || dataReponse?.error) {
+        toast.error(dataReponse?.message || "Unable to load product details")
+      }
+    } catch (error) {
+      setData(initialProductState)
+      setActiveImage("")
+      toast.error(error.message || "Unable to load product details")
+    } finally {
+      setLoading(false)
+    }
 
   }
 
-  console.log("data",data)
-
   useEffect(()=>{
     fetchProductDetails()
-  },[params])
+  },[params?.id])
 
   const handleMouseEnterProduct = (imageURL)=>{
     setActiveImage(imageURL)
   }
 
   const handleAddToCart = async(e,id) =>{
+    if (!id) {
+      return
+    }
     await addToCart(e,id)
     fetchUserAddToCart()
   }
 
   const handleBuyProduct = async(e,id)=>{
+    if (!id) {
+      return
+    }
     await addToCart(e,id)
     fetchUserAddToCart()
     navigate("/cart")
@@ -109,7 +146,7 @@ const ProductDetails = () => {
                             }
                             const isActive = activeImage === imageUrl
                             return(
-                              <div className={`legacy-media-frame legacy-media-frame--thumb product-details__thumb ${isActive ? 'product-details__thumb--active' : ''}`} key={imageUrl}>
+                              <div className={`legacy-media-frame legacy-media-frame--thumb product-details__thumb ${isActive ? 'product-details__thumb--active' : ''}`} key={`${imageUrl}-${index}`}>
                                 <img src={imageUrl} className='legacy-media-frame__image legacy-media-frame__image--detail' onMouseEnter={()=>handleMouseEnterProduct(imageUrl)}  onClick={()=>handleMouseEnterProduct(imageUrl)}/>
                               </div>
                             )

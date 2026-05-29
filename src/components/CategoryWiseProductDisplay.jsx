@@ -1,7 +1,6 @@
-import React, { useContext, useEffect, useRef, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import fetchCategoryWiseProduct from '../helpers/fetchCategoryWiseProduct'
 import displayINRCurrency from '../helpers/displayCurrency'
-import { FaAngleLeft, FaAngleRight } from 'react-icons/fa6'
 import { Link } from 'react-router-dom'
 import addToCart from '../helpers/addToCart'
 import Context from '../context'
@@ -26,10 +25,8 @@ const CategroyWiseProductDisplay = ({category, heading}) => {
     const fetchData = async() =>{
         setLoading(true)
         const categoryProduct = await fetchCategoryWiseProduct(category)
+        setData(Array.isArray(categoryProduct?.data) ? categoryProduct.data : [])
         setLoading(false)
-
-        console.log("horizontal data",categoryProduct.data)
-        setData(categoryProduct?.data)
     }
 
     useEffect(()=>{
@@ -49,9 +46,9 @@ const CategroyWiseProductDisplay = ({category, heading}) => {
            {
 
                 loading ? (
-                    loadingList.map((product,index)=>{
+                    loadingList.map((_,index)=>{
                         return(
-                            <div className='product-card-vertical product-card-vertical--loading'>
+                            <div className='product-card-vertical product-card-vertical--loading' key={`category-wise-loading-${index}`}>
                                 <div className='product-card-vertical__media product-card-skeleton'>
                                 </div>
                                 <div className='product-card-vertical__content'>

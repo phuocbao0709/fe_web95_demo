@@ -13,6 +13,7 @@ import Context from '../context';
 
 const Login = () => {
     const [showPassword,setShowPassword] = useState(false)
+    const [submitting,setSubmitting] = useState(false)
     const [data,setData] = useState({
         email : "",
         password : ""
@@ -35,28 +36,45 @@ const Login = () => {
     const handleSubmit = async(e) =>{
         e.preventDefault()
 
-        const dataResponse = await fetch(SummaryApi.signIn.url,{
-            method : SummaryApi.signIn.method,
-            credentials : 'include',
-            headers : {
-                "content-type" : "application/json"
-            },
-            body : JSON.stringify(data)
-        })
+        const email = data.email.trim()
+        const password = data.password
 
-        const dataApi = await dataResponse.json()
-
-        if(dataApi.success){
-            toast.success(dataApi.message)
-            navigate('/')
-            fetchUserDetails()
-            fetchUserAddToCart()
+        if(!email || !password){
+            toast.error("Email and password are required")
+            return
         }
 
-        if(dataApi.error){
-            toast.error(dataApi.message)
-        }
+        setSubmitting(true)
 
+        try {
+            const dataResponse = await fetch(SummaryApi.signIn.url,{
+                method : SummaryApi.signIn.method,
+                credentials : 'include',
+                headers : {
+                    "content-type" : "application/json"
+                },
+                body : JSON.stringify({
+                    email,
+                    password
+                })
+            })
+
+            const dataApi = await dataResponse.json()
+
+            if(dataApi.success){
+                toast.success(dataApi.message)
+                await fetchUserDetails()
+                await fetchUserAddToCart()
+                navigate('/')
+                return
+            }
+
+            toast.error(dataApi.message || "Login failed")
+        } catch (error) {
+            toast.error(error.message || "Unable to login")
+        } finally {
+            setSubmitting(false)
+        }
     }
   return (
     <section id='login' className='auth-page'>
@@ -110,7 +128,7 @@ const Login = () => {
                                     name='password' 
                                     onChange={handleOnChange}
                                     className='auth-input__control'/>
-                                <div className='auth-input__toggle' onClick={()=>setShowPassword((preve)=>!preve)}>
+                                <button type='button' className='auth-input__toggle' onClick={()=>setShowPassword((preve)=>!preve)}>
                                     <span>
                                         {
                                             showPassword ? (
@@ -122,11 +140,11 @@ const Login = () => {
                                             )
                                         }
                                     </span>
-                                </div>
+                                </button>
                             </div>
                         </div>
 
-                        <button className='auth-submit-button'>Login</button>
+                        <button className='auth-submit-button' disabled={submitting}>{submitting ? "Signing in..." : "Login"}</button>
 
                     </form>
 

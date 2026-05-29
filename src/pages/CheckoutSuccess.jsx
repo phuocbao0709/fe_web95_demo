@@ -1,6 +1,8 @@
 import React, { useContext, useEffect } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import Context from '../context'
+import SummaryApi from '../common'
+import { toast } from 'react-toastify'
 
 const CheckoutSuccess = () => {
   const [searchParams] = useSearchParams()
@@ -8,8 +10,31 @@ const CheckoutSuccess = () => {
   const context = useContext(Context)
 
   useEffect(()=>{
-    context?.fetchUserAddToCart?.()
-  },[context])
+    const syncCheckout = async() => {
+      if (!sessionId) {
+        context?.fetchUserAddToCart?.()
+        return
+      }
+
+      try{
+        const response = await fetch(`${SummaryApi.confirmCheckoutSession.url}?session_id=${encodeURIComponent(sessionId)}`,{
+          method : SummaryApi.confirmCheckoutSession.method,
+          credentials : 'include'
+        })
+        const data = await response.json()
+
+        if(!response.ok || data.error){
+          toast.error(data.message || 'Unable to refresh checkout status')
+        }
+      }catch(error){
+        toast.error(error.message || 'Unable to refresh checkout status')
+      }finally{
+        context?.fetchUserAddToCart?.()
+      }
+    }
+
+    syncCheckout()
+  },[context, sessionId])
 
   return (
     <section className='checkout-status'>

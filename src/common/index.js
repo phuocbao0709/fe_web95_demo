@@ -1,117 +1,146 @@
 const rawBackendUrl = import.meta.env.VITE_BACKEND_URL?.trim()
 const isDev = import.meta.env.DEV
+const currentHostname = typeof window !== "undefined" ? window.location.hostname : ""
+const isLocalRuntime = currentHostname === "localhost" || currentHostname === "127.0.0.1"
+const localDevelopmentBackendUrl = "http://localhost:3003"
+const stableProductionBackendUrl = "https://be-web95-demo.vercel.app"
 
-const backendDomin = rawBackendUrl
-    ? rawBackendUrl.replace(/\/+$/, "")
-    : isDev
-        ? "http://localhost:3003"
-        : null
+const normalizeBackendUrl = (url) => {
+    if (!url) {
+        return url
+    }
 
-if (!backendDomin) {
-    throw new Error(
-        "Missing VITE_BACKEND_URL in production build. Set it in Vercel Project Settings before deploying."
-    )
+    const sanitizedUrl = url.replace(/\/+$/, "")
+
+    // Avoid pinning production to a protected/stale deployment URL.
+    if (/^https:\/\/be-web95-demo-[a-z0-9]+-phuocbao0709s-projects\.vercel\.app$/i.test(sanitizedUrl)) {
+        return stableProductionBackendUrl
+    }
+
+    return sanitizedUrl
 }
+
+const resolvedEnvBackendUrl = rawBackendUrl ? normalizeBackendUrl(rawBackendUrl) : ""
+
+const backendDomain = (() => {
+    if (isDev) {
+        return resolvedEnvBackendUrl || localDevelopmentBackendUrl
+    }
+
+    if (!resolvedEnvBackendUrl) {
+        return stableProductionBackendUrl
+    }
+
+    if (!isLocalRuntime && /^http:\/\/localhost(?::\d+)?$/i.test(resolvedEnvBackendUrl)) {
+        return stableProductionBackendUrl
+    }
+
+    return resolvedEnvBackendUrl
+})()
 
 const SummaryApi = {
     signUP : {
-        url : `${backendDomin}/api/signup`,
+        url : `${backendDomain}/api/signup`,
         method : "post"
     },
     signIn : {
-        url : `${backendDomin}/api/signin`,
+        url : `${backendDomain}/api/signin`,
         method : "post"
     },
     current_user : {
-        url : `${backendDomin}/api/user-details`,
+        url : `${backendDomain}/api/user-details`,
         method : "get"
     },
     logout_user : {
-        url : `${backendDomin}/api/userLogout`,
+        url : `${backendDomain}/api/userLogout`,
         method : 'get'
     },
     allUser : {
-        url : `${backendDomin}/api/all-user`,
+        url : `${backendDomain}/api/all-user`,
         method : 'get'
     },
     updateUser : {
-        url : `${backendDomin}/api/update-user`,
+        url : `${backendDomain}/api/update-user`,
         method : "post"
     },
     uploadProduct : {
-        url : `${backendDomin}/api/upload-product`,
+        url : `${backendDomain}/api/upload-product`,
         method : 'post'
     },
     allProduct : {
-        url : `${backendDomin}/api/get-product`,
+        url : `${backendDomain}/api/get-product`,
         method : 'get'
     },
     updateProduct : {
-        url : `${backendDomin}/api/update-product`,
+        url : `${backendDomain}/api/update-product`,
         method  : 'post'
     },
     deleteProduct : {
-        url : `${backendDomin}/api/delete-product`,
+        url : `${backendDomain}/api/delete-product`,
         method : 'post'
     },
     categoryProduct : {
-        url : `${backendDomin}/api/get-categoryProduct`,
+        url : `${backendDomain}/api/get-categoryProduct`,
         method : 'get'
     },
     categoryWiseProduct : {
-        url : `${backendDomin}/api/category-product`,
+        url : `${backendDomain}/api/category-product`,
         method : 'post'
     },
     productDetails : {
-        url : `${backendDomin}/api/product-details`,
+        url : `${backendDomain}/api/product-details`,
         method : 'post'
     },
     addToCartProduct : {
-        url : `${backendDomin}/api/addtocart`,
+        url : `${backendDomain}/api/addtocart`,
         method : 'post'
     },
     addToCartProductCount : {
-        url : `${backendDomin}/api/countAddToCartProduct`,
+        url : `${backendDomain}/api/countAddToCartProduct`,
         method : 'get'
     },
     addToCartProductView : {
-        url : `${backendDomin}/api/view-card-product`,
+        url : `${backendDomain}/api/view-card-product`,
         method : 'get'
     },
     updateCartProduct : {
-        url : `${backendDomin}/api/update-cart-product`,
+        url : `${backendDomain}/api/update-cart-product`,
         method : 'post'
     },
     deleteCartProduct : {
-        url : `${backendDomin}/api/delete-cart-product`,
+        url : `${backendDomain}/api/delete-cart-product`,
         method : 'post'
     },
     createCheckoutSession : {
-        url : `${backendDomin}/api/create-checkout-session`,
+        url : `${backendDomain}/api/create-checkout-session`,
         method : 'post'
     },
+    confirmCheckoutSession : {
+        url : `${backendDomain}/api/confirm-checkout-session`,
+        method : 'get'
+    },
     myOrders : {
-        url : `${backendDomin}/api/my-orders`,
+        url : `${backendDomain}/api/my-orders`,
         method : 'get'
     },
     orderDetails : {
-        url : `${backendDomin}/api/order`,
+        url : `${backendDomain}/api/order`,
         method : 'get'
     },
     adminOrders : {
-        url : `${backendDomin}/api/admin/orders`,
+        url : `${backendDomain}/api/admin/orders`,
         method : 'get'
     },
     updateOrderStatus : {
-        url : `${backendDomin}/api/admin/order-status`,
+        url : `${backendDomain}/api/admin/order-status`,
         method : 'post'
     },
     searchProduct : {
-        url : `${backendDomin}/api/search`,
+        url : `${backendDomain}/api/search`,
         method : 'get'
     },
     filterProduct : {
-        url : `${backendDomin}/api/filter-product`,
+        url : `${backendDomain}/api/filter-product`,
         method : 'post'
     }
 }

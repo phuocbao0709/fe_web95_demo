@@ -17,27 +17,35 @@ function App() {
   const isAuthPage = location.pathname === '/login' || location.pathname === '/sign-up'
 
   const fetchUserDetails = async()=>{
-      const dataResponse = await fetch(SummaryApi.current_user.url,{
-        method : SummaryApi.current_user.method,
+      try{
+        const dataResponse = await fetch(SummaryApi.current_user.url,{
+          method : SummaryApi.current_user.method,
+          credentials : 'include'
+        })
+
+        const dataApi = await dataResponse.json()
+
+        if(dataApi.success){
+          dispatch(setUserDetails(dataApi.data))
+        }
+      }catch(_error){
+        dispatch(setUserDetails(null))
+      }
+  }
+
+  const fetchUserAddToCart = async()=>{
+    try{
+      const dataResponse = await fetch(SummaryApi.addToCartProductCount.url,{
+        method : SummaryApi.addToCartProductCount.method,
         credentials : 'include'
       })
 
       const dataApi = await dataResponse.json()
 
-      if(dataApi.success){
-        dispatch(setUserDetails(dataApi.data))
-      }
-  }
-
-  const fetchUserAddToCart = async()=>{
-    const dataResponse = await fetch(SummaryApi.addToCartProductCount.url,{
-      method : SummaryApi.addToCartProductCount.method,
-      credentials : 'include'
-    })
-
-    const dataApi = await dataResponse.json()
-
-    setCartProductCount(dataApi?.data?.count)
+      setCartProductCount(dataApi?.data?.count || 0)
+    }catch(_error){
+      setCartProductCount(0)
+    }
   }
 
   useEffect(()=>{
